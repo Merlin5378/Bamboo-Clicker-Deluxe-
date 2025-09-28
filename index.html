@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bamboo Clicker Deluxe 🌱</title>
+<style>
+/* --- BODY & LAYOUT --- */
+body {
+  background: linear-gradient(to bottom, #145a32, #27ae60);
+  font-family: "Trebuchet MS", sans-serif;
+  color: #fff;
+  display: flex;
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* --- GAME AREA --- */
+.game {
+  flex: 2;
+  text-align: center;
+  padding: 20px;
+  position: relative;
+}
+
+h1 {
+  font-size: 3rem;
+  text-shadow: 0 0 15px black;
+}
+
+/* --- BAMBOO CLICKER --- */
+#bamboo {
+  width: 120px;
+  height: 250px;
+  margin: 30px auto;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+  background: repeating-linear-gradient(
+    to bottom,
+    #2ecc71 0px,
+    #2ecc71 15px,
+    #27ae60 15px,
+    #27ae60 30px
+  );
+  border-radius: 30% / 10%;
+  box-shadow: inset 0 0 15px #145a32, 4px 4px 10px #0b3d20;
+  transition: transform 0.15s;
+}
+#bamboo:active { transform: scale(1.15); }
+
+/* --- SCORE --- */
+#score {
+  font-size: 2.5rem;
+  margin: 10px;
+  background: rgba(0,0,0,0.5);
+  display: inline-block;
+  padding: 15px 30px;
+  border-radius: 16px;
+  box-shadow: 0 0 20px #0b3d20, 0 0 10px #38d97a inset;
+  text-shadow: 0 0 5px #38d97a;
+  font-weight: bold;
+}
+
+/* --- STATUS HUD --- */
+#status {
+  margin-top: 15px;
+  padding: 12px;
+  background: rgba(0,0,0,0.65);
+  border-radius: 12px;
+  display: inline-block;
+  text-align: left;
+  min-width: 300px;
+  box-shadow: inset 0 0 10px #0b3d20;
+}
+#status h3 {
+  margin: 0 0 10px;
+  text-align: center;
+  color: #a3ff8d;
+  text-shadow: 0 0 5px #145a32;
+}
+.status-line { margin: 5px 0; font-size: 1rem; }
+.boost-active { color: #f1c40f; font-weight: bold; }
+.boost-timer { font-size: 0.9rem; color: #ffdd57; }
+
+/* --- SHOP --- */
+.shop {
+  flex: 1;
+  background: rgba(0,0,0,0.7);
+  padding: 20px;
+  overflow-y: auto;
+  max-height: 100vh;
+  box-shadow: inset 0 0 20px #145a32;
+}
+.shop h2 {
+  text-align: center;
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+  color: #f1c40f;
+  text-shadow: 0 0 5px #145a32;
+}
+.category { margin-bottom: 20px; }
+.category h3 { text-align: center; margin-bottom: 10px; color: #a3ff8d; }
+
+/* --- SHOP ITEMS --- */
+.item {
+  background: linear-gradient(145deg, #2ecc71, #27ae60);
+  margin: 8px 0;
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.2s;
+  box-shadow: 4px 4px 10px #0b3d20, -4px -4px 10px #38d97a;
+  border: 2px solid #145a32;
+  color: #fff;
+  font-weight: bold;
+  text-align: center;
+  position: relative;
+}
+.item.disabled {
+  background: linear-gradient(145deg, #555, #333);
+  box-shadow: none;
+  border: 2px solid #222;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+.item:hover:not(.disabled)::after {
+  content: attr(data-desc);
+  position: absolute;
+  left: 105%;
+  top: 0;
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  padding: 5px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+  font-size: 0.8rem;
+}
+
+/* --- CLICK BUBBLES --- */
+.bubble {
+  position: absolute;
+  width: 40px;
+  height: 60px;
+  background: repeating-linear-gradient(
+    to bottom,
+    #2ecc71 0px,
+    #2ecc71 15px,
+    #27ae60 15px,
+    #27ae60 30px
+  );
+  border-radius: 30% / 10%;
+  opacity: 0.85;
+  pointer-events: none;
+  z-index: 1;
+  font-size: 0.9rem;
+  color: #fff;
+  text-align: center;
+  line-height: 60px;
+  font-weight: bold;
+  box-shadow: 2px 2px 8px #0b3d20, inset 0 0 5px #38d97a;
+  animation: floatUp 1s forwards;
+}
+@keyframes floatUp {
+  0% { transform: translateY(0); opacity:0.9; }
+  100% { transform: translateY(-120px); opacity:0; }
+}
+</style>
+</head>
+<body>
+
+<div class="game">
+  <h1>🌱 Bamboo Clicker Deluxe 🌱</h1>
+  <div id="bamboo"></div>
+  <div id="score">Bamboo: 0</div>
+
+  <div id="status">
+    <h3>Status</h3>
+    <div class="status-line">Click Power: <span id="statusClick">1</span></div>
+    <div class="status-line">Auto Bamboo/sec: <span id="statusAuto">0</span></div>
+    <div class="status-line">Active Boosts: <span id="statusBoosts">None</span></div>
+  </div>
+</div>
+
+<div class="shop">
+  <h2>Shop</h2>
+  <div class="category" id="click-upgrades"><h3>Click Upgrades</h3></div>
+  <div class="category" id="auto-bamboo"><h3>Auto Bamboo</h3></div>
+  <div class="category" id="special-items"><h3>Special Items</h3></div>
+  <div class="category" id="prestige"><h3>Prestige / Boosts</h3></div>
+</div>
+
+<script>
+let score = 0;
+let clickPower = 1;
+let autoIncome = 0;
+let activeBoosts = [];
+
+const bamboo = document.getElementById("bamboo");
+const scoreDisplay = document.getElementById("score");
+const statusClick = document.getElementById("statusClick");
+const statusAuto = document.getElementById("statusAuto");
+const statusBoosts = document.getElementById("statusBoosts");
+
+const shopItems = [
+  {id:"upgrade1", name:"+1 per click", desc:"Clicking gives +1 bamboo", cost:10, type:"click", value:1, category:"click-upgrades"},
+  {id:"upgrade5", name:"+5 per click", desc:"Clicking gives +5 bamboo", cost:100, type:"click", value:5, category:"click-upgrades"},
+  {id:"farm", name:"Bamboo Farm", desc:"Generates 1 bamboo/sec", cost:50, type:"auto", value:1, category:"auto-bamboo"},
+  {id:"plantation", name:"Plantation", desc:"Generates 5 bamboo/sec", cost:250, type:"auto", value:5, category:"auto-bamboo"},
+  {id:"golden-bamboo", name:"Golden Bamboo", desc:"+20 bamboo/click", cost:500, type:"special", value:20, category:"special-items"},
+  {id:"boost", name:"Bamboo Boost", desc:"Double click power for 30 sec", cost:1000, type:"boost", value:2, category:"prestige"}
+];
+
+function renderShop() {
+  shopItems.forEach(item=>{
+    let catDiv = document.getElementById(item.category);
+    if(!document.getElementById(item.id)){
+      const div = document.createElement("div");
+      div.classList.add("item");
+      div.id = item.id;
+      div.setAttribute("data-desc", item.desc);
+      div.innerHTML = `${item.name} - Cost: ${item.cost}`;
+      div.addEventListener("click", ()=>buyItem(item));
+      catDiv.appendChild(div);
+    }
+    const btn = document.getElementById(item.id);
+    if(score >= item.cost) btn.classList.remove("disabled");
+    else btn.classList.add("disabled");
+  });
+}
+
+function buyItem(item){
+  if(score >= item.cost){
+    score -= item.cost;
+
+    if(item.type==="click") clickPower += item.value;
+    else if(item.type==="auto") autoIncome += item.value;
+    else if(item.type==="special") clickPower += item.value;
+    else if(item.type==="boost"){
+      clickPower *= item.value;
+      let boost = {name:item.name, duration:30, multiplier:item.value};
+      activeBoosts.push(boost);
+      let interval = setInterval(()=>{
+        boost.duration--;
+        if(boost.duration<=0){
+          clickPower /= boost.multiplier;
+          activeBoosts = activeBoosts.filter(b=>b!==boost);
+          clearInterval(interval);
+          updateStatus();
+        }
+        updateStatus();
+      },1000);
+    }
+
+    // Preissteigerung pro Kauf
+    item.cost = Math.ceil(item.cost * 1.15);
+
+    updateScore();
+    updateStatus();
+    renderShop();
+  }
+}
+
+// Klick-Event
+bamboo.addEventListener("click", ()=>{
+  score += clickPower;
+  bamboo.style.transform="scale(1.2)";
+  setTimeout(()=>bamboo.style.transform="scale(1)",100);
+
+  createBubble(clickPower);
+  updateScore();
+  renderShop();
+});
+
+// Auto Bamboo
+setInterval(()=>{
+  score += autoIncome;
+  updateScore();
+  renderShop();
+},1000);
+
+function updateScore(){ scoreDisplay.textContent=`Bamboo: ${score}`; }
+
+function updateStatus(){
+  statusClick.textContent = clickPower;
+  statusAuto.textContent = autoIncome;
+  if(activeBoosts.length>0){
+    statusBoosts.innerHTML = activeBoosts.map(b=>`<span class="boost-active">${b.name} (<span class="boost-timer">${b.duration}s</span>)</span>`).join(", ");
+  } else statusBoosts.textContent = "None";
+}
+
+// --- Bubble ---
+function createBubble(amount){
+  const bubble = document.createElement("div");
+  bubble.classList.add("bubble");
+  bubble.textContent = "+" + amount;
+  const rect = bamboo.getBoundingClientRect();
+  bubble.style.left = rect.left + rect.width/2 - 20 + "px";
+  bubble.style.top = rect.top - 10 + "px";
+  document.body.appendChild(bubble);
+  setTimeout(()=>bubble.remove(),1000);
+}
+
+renderShop();
+updateStatus();
+</script>
+</body>
+</html>
